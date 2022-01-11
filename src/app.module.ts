@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RestaurnatsModule } from './restaurnats/restaurnats.module';
 import * as Joi from 'joi';
 import { Restaurant } from './restaurnats/entities/nestaurant.entity';
+import { User } from './users/entities/user.entity';
+import { UsersModule } from './users/users.module';
 
 
 @Module({
@@ -32,11 +34,11 @@ import { Restaurant } from './restaurnats/entities/nestaurant.entity';
       database: process.env.DB_NAME,
       synchronize: true,
       logging: process.env.NODE_ENV === "dev",
-      entities: [Restaurant]
+      entities: [User]
     }),
     GraphQLModule.forRoot({
     autoSchemaFile: true,
-  }),RestaurnatsModule ],
+  }),UsersModule],
   controllers: [],
   providers: [],
 })
