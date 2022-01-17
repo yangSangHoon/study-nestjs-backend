@@ -5,10 +5,15 @@ import { CreateAccountInput } from './dto/create-account.dto';
 import { LoginInput } from './dto/login.dto';
 import { User } from './entities/user.entity';
 
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from 'src/jwt/jwt.service';
+import { number } from 'joi';
+
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly user: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async createAccount({
@@ -48,10 +53,16 @@ export class UsersService {
         };
       }
 
+      const token = this.jwtService.sign(user.id);
+
       return {
         ok: true,
-        token: 'tokenefwefwf',
+        token,
       };
     } catch (e) {}
+  }
+
+  async fintById(id: number) {
+    return this.user.findOne(id);
   }
 }
