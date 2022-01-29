@@ -16,6 +16,7 @@ import { UserService } from './users.service';
 @Resolver((of) => User)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
+
   @Mutation((returns) => CreateAccountOutput)
   async createAccount(
     @Args('input') createAccountInput: CreateAccountInput,
@@ -41,8 +42,8 @@ export class UserResolver {
     return this.userService.findById(userProfileInput.userId);
   }
 
-  @UseGuards(AuthGuard)
   @Mutation((returns) => EditProfileOutput)
+  @UseGuards(AuthGuard)
   async editProfile(
     @AuthUser() authUser: User,
     @Args('input') editProfileInput: EditProfileInput,
@@ -52,6 +53,6 @@ export class UserResolver {
 
   @Mutation((returns) => VerifyEmailOutput)
   verifyEmail(@Args('input') { code }: VerifyEmailInput) {
-    return this.userService.vefiryEmail(code);
+    return this.userService.verifyEmail(code);
   }
 }

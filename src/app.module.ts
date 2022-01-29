@@ -7,15 +7,13 @@ import {
 import { GraphQLModule } from '@nestjs/graphql';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RestaurnatsModule } from './restaurnats/restaurnats.module';
 import * as Joi from 'joi';
-import { Restaurant } from './restaurnats/entities/nestaurant.entity';
 import { User } from './users/entities/user.entity';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
-import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
+import { Verification } from './users/entities/verification.entity';
 
 @Module({
   imports: [
@@ -45,7 +43,7 @@ import { MailModule } from './mail/mail.module';
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: process.env.NODE_ENV === 'dev',
-      entities: [User],
+      entities: [User, Verification],
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: true,

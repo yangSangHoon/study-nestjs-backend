@@ -7,13 +7,11 @@ import {
 } from './dtos/create-account.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
-
 import { JwtService } from 'src/jwt/jwt.service';
-import { number } from 'joi';
-import { EditProfileInput } from './dtos/edit-profile.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { Verification } from './entities/verification.entity';
-import { UserProfileOutput } from './dtos/user-profile.dto';
 import { VerifyEmailOutput } from './dtos/verify-email.dto';
+import { UserProfileOutput } from './dtos/user-profile.dto';
 import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
@@ -34,18 +32,20 @@ export class UserService {
     try {
       const exists = await this.users.findOne({ email });
       if (exists) {
-        return { ok: true, error: 'aleady email' };
+        return { ok: false, error: 'There is a user with that email already' };
       }
       const user = await this.users.save(
         this.users.create({ email, password, role }),
       );
       const verification = await this.verifications.save(
-        this.verifications.create({ user }),
+        this.verifications.create({
+          user,
+        }),
       );
       this.mailService.sendVerificationEmail(user.email, verification.code);
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: 'could not make email' };
+      return { ok: false, error: "Couldn't create account" };
     }
   }
 
@@ -58,24 +58,28 @@ export class UserService {
       if (!user) {
         return {
           ok: false,
-          error: 'no email',
+          error: 'User not found',
         };
       }
       const passwordCorrect = await user.checkPassword(password);
       if (!passwordCorrect) {
         return {
           ok: false,
-          error: 'wrong password',
+          error: 'Wrong password',
         };
       }
 
       const token = this.jwtService.sign(user.id);
-
       return {
         ok: true,
         token,
       };
-    } catch (e) {}
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
   }
 
   async findById(id: number): Promise<UserProfileOutput> {
@@ -92,7 +96,10 @@ export class UserService {
     }
   }
 
-  async editProfile(userId: number, { email, password }: EditProfileInput) {
+  async editProfile(
+    userId: number,
+    { email, password }: EditProfileInput,
+  ): Promise<EditProfileOutput> {
     try {
       const user = await this.users.findOne(userId);
       if (email) {
@@ -115,7 +122,7 @@ export class UserService {
     }
   }
 
-  async vefiryEmail(code: string): Promise<VerifyEmailOutput> {
+  async verifyEmail(code: string): Promise<VerifyEmailOutput> {
     try {
       const verification = await this.verifications.findOne(
         { code },
