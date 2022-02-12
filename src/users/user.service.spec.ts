@@ -278,5 +278,4 @@ describe('UserService', () => {
       expect(result).toEqual({ ok: false, error: 'Could not verify email' });
     });
   });
-  it.todo('verifyEmail');
 });
