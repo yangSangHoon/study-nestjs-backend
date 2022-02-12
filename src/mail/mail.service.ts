@@ -9,11 +9,11 @@ export class MailService {
   constructor(
     @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions,
   ) {}
-  private async sendEmail(
+  async sendEmail(
     subject: string,
     template: string,
     emailVars: EMailVars[],
-  ) {
+  ): Promise<boolean> {
     const form = new FormData();
     form.append('from', `Excited User <mailgun@${this.options.domain}>`);
     form.append('to', `nico@nomadcoders.co`);
@@ -21,19 +21,22 @@ export class MailService {
     form.append('template', template);
     emailVars.forEach((eVar) => form.append(`v:${eVar.key}`, eVar.value));
 
-    const response = await got(
-      `https://api.mailgun.net/v3/${this.options.domain}/messages`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${Buffer.from(
-            `api:${this.options.apiKey}`,
-          ).toString('base64')}`,
+    try {
+      const response = await got.post(
+        `https://api.mailgun.net/v3/${this.options.domain}/messages`,
+        {
+          headers: {
+            Authorization: `Basic ${Buffer.from(
+              `api:${this.options.apiKey}`,
+            ).toString('base64')}`,
+          },
+          body: form,
         },
-        body: form,
-      },
-    );
-    console.log(response.body);
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   sendVerificationEmail(email: string, code: string) {
