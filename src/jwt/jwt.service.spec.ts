@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { JwtService } from './jwt.service';
 import * as jwt from 'jsonwebtoken';
-import exp from 'constants';
 
 const TEST_KEY = 'testKey';
 const USER_ID = 1;
@@ -35,7 +34,7 @@ describe('JwtService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('sing', () => {
+  describe('sign', () => {
     it('should return a signed token', () => {
       const token = service.sign(USER_ID);
       expect(typeof token).toBe('string');

@@ -32,27 +32,6 @@ describe('MailService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('sendEmail', () => {
-    it('send email', async () => {
-      const ok = await service.sendEmail('', '', []);
-      const fromSpy = jest.spyOn(FormData.prototype, 'append');
-      expect(fromSpy).toHaveBeenCalled();
-      expect(got.post).toHaveBeenCalledTimes(1);
-      expect(got.post).toHaveBeenCalledWith(
-        `https://api.mailgun.net/v3/${TEST_DOMAIN}/messages`,
-        expect.any(Object),
-      );
-      expect(ok).toEqual(true);
-    });
-
-    it('fails on error', async () => {
-      jest.spyOn(got, 'post').mockImplementation(() => {
-        throw new Error();
-      });
-      const ok = await service.sendEmail('', '', []);
-      expect(ok).toEqual(false);
-    });
-  });
   describe('sendVerificationEmail', () => {
     it('should call sendEmail', () => {
       const sendVerificationEmailArgs = {
@@ -75,6 +54,28 @@ describe('MailService', () => {
           { key: 'username', value: sendVerificationEmailArgs.email },
         ],
       );
+    });
+  });
+
+  describe('sendEmail', () => {
+    it('send email', async () => {
+      const ok = await service.sendEmail('', '', []);
+      const fromSpy = jest.spyOn(FormData.prototype, 'append');
+      expect(fromSpy).toHaveBeenCalled();
+      expect(got.post).toHaveBeenCalledTimes(1);
+      expect(got.post).toHaveBeenCalledWith(
+        `https://api.mailgun.net/v3/${TEST_DOMAIN}/messages`,
+        expect.any(Object),
+      );
+      expect(ok).toEqual(true);
+    });
+
+    it('fails on error', async () => {
+      jest.spyOn(got, 'post').mockImplementation(() => {
+        throw new Error();
+      });
+      const ok = await service.sendEmail('', '', []);
+      expect(ok).toEqual(false);
     });
   });
 });
